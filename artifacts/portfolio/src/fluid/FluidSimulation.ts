@@ -302,15 +302,18 @@ export class FluidSimulation {
     return obj;
   }
 
-  private setupEventListeners() {
-    const canvas = this.canvas;
+  private updatePointer(clientX: number, clientY: number) {
+    const rect = this.canvas.getBoundingClientRect();
+    this.mouse.px = this.mouse.x;
+    this.mouse.py = this.mouse.y;
+    this.mouse.x = (clientX - rect.left) / rect.width;
+    this.mouse.y = 1 - (clientY - rect.top) / rect.height;
+  }
 
+  private setupEventListeners() {
+    // Mouse
     document.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      this.mouse.px = this.mouse.x;
-      this.mouse.py = this.mouse.y;
-      this.mouse.x = (e.clientX - rect.left) / rect.width;
-      this.mouse.y = 1 - (e.clientY - rect.top) / rect.height;
+      this.updatePointer(e.clientX, e.clientY);
     });
 
     document.addEventListener('mousedown', () => {
@@ -318,6 +321,24 @@ export class FluidSimulation {
     });
 
     document.addEventListener('mouseup', () => {
+      this.mouse.down = false;
+    });
+
+    // Touch
+    document.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      this.updatePointer(t.clientX, t.clientY);
+      this.mouse.down = true;
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      this.updatePointer(t.clientX, t.clientY);
+    }, { passive: false });
+
+    document.addEventListener('touchend', () => {
       this.mouse.down = false;
     });
   }
