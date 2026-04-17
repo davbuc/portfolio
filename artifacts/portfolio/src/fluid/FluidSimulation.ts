@@ -324,21 +324,28 @@ export class FluidSimulation {
       this.mouse.down = false;
     });
 
-    // Touch
-    document.addEventListener('touchstart', (e) => {
+    // Touch — attached to canvas to allow preventDefault without passive restriction
+    const canvas = this.canvas;
+    canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const t = e.touches[0];
       this.updatePointer(t.clientX, t.clientY);
+      this.mouse.px = this.mouse.x;
+      this.mouse.py = this.mouse.y;
       this.mouse.down = true;
     }, { passive: false });
 
-    document.addEventListener('touchmove', (e) => {
+    canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
       const t = e.touches[0];
       this.updatePointer(t.clientX, t.clientY);
     }, { passive: false });
 
-    document.addEventListener('touchend', () => {
+    canvas.addEventListener('touchend', () => {
+      this.mouse.down = false;
+    });
+
+    canvas.addEventListener('touchcancel', () => {
       this.mouse.down = false;
     });
   }
