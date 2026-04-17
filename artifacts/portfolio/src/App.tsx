@@ -58,7 +58,6 @@ export default function App() {
           <p className="bio-primary">
             Building thoughtful digital products at the intersection of design and technology.
           </p>
-          <p className="bio-secondary">Design + Engineering. Based in Zurich.</p>
         </main>
       </div>
     </div>
