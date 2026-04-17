@@ -91,7 +91,7 @@ html, body, #root {
   color: #181818;
   line-height: 1.65;
   max-width: 360px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .bio-secondary {
@@ -101,12 +101,13 @@ html, body, #root {
   color: #181818;
   opacity: 0.45;
   letter-spacing: 0.01em;
+  margin-bottom: 4px;
 }
 
 .bio-link {
   display: block;
   text-decoration: none;
-  margin-bottom: 3px;
+  margin-bottom: 0;
   pointer-events: all;
 }
 
