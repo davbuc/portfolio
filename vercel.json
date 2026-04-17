@@ -1,0 +1,9 @@
+{
+  "installCommand": "pnpm install --filter @workspace/portfolio",
+  "buildCommand": "pnpm --filter @workspace/portfolio build",
+  "outputDirectory": "artifacts/portfolio/dist/public",
+  "env": {
+    "NODE_ENV": "production",
+    "BASE_PATH": "/"
+  }
+}
