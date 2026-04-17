@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #eff2f6;
+}
+
+.app-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #eff2f6;
+  overflow: hidden;
+}
+
+.fluid-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Overlay ── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 44px 52px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ── Header ── */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.site-name {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #181818;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  pointer-events: all;
+}
+
+.nav-link {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #181818;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.nav-link:hover {
+  opacity: 1;
+}
+
+/* ── Bio ── */
+.site-main {
+  margin-top: auto;
+  margin-bottom: 4px;
+}
+
+.bio-primary {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: #181818;
+  line-height: 1.65;
+  max-width: 360px;
+  margin-bottom: 5px;
+}
+
+.bio-secondary {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #181818;
+  opacity: 0.45;
+  letter-spacing: 0.01em;
+}
+
+/* ── Theme toggle ── */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #181818;
+  opacity: 0.45;
+  padding: 0;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+  pointer-events: all;
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+}
+
+/* ── Dark mode ── */
+.app-container.dark {
+  background: #000;
+}
+
+.app-container.dark .site-name,
+.app-container.dark .nav-link,
+.app-container.dark .theme-toggle,
+.app-container.dark .bio-primary,
+.app-container.dark .bio-secondary {
+  color: #e8e8e8;
+}
