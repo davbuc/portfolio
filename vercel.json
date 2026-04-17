@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --filter @workspace/portfolio",
+  "installCommand": "pnpm install --filter @workspace/portfolio --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @workspace/portfolio build",
   "outputDirectory": "artifacts/portfolio/dist/public",
   "env": {
