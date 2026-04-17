@@ -10,13 +10,15 @@ export default function App() {
   useEffect(() => {
     const onStart = (e: TouchEvent) => {
       const t = e.touches[0];
-      const c = canvasRef.current;
-      const rect = c?.getBoundingClientRect();
-      setDebug(`start ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} rect ${rect?.width.toFixed(0)}x${rect?.height.toFixed(0)} dpr ${window.devicePixelRatio} canvas ${c?.width}x${c?.height}`);
+      const sim: any = simRef.current;
+      const splats = sim?._splatCount ?? 'no-sim';
+      setDebug(`start ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} splats=${splats}`);
     };
     const onMove = (e: TouchEvent) => {
       const t = e.touches[0];
-      setDebug(d => `move ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} | ${d.split(' | ')[0] ?? ''}`);
+      const sim: any = simRef.current;
+      const splats = sim?._splatCount ?? '?';
+      setDebug(`move ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} splats=${splats}`);
     };
     document.addEventListener('touchstart', onStart, { passive: true });
     document.addEventListener('touchmove', onMove, { passive: true });

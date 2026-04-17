@@ -385,7 +385,11 @@ export class FluidSimulation {
     this.animationId = requestAnimationFrame(this.animate);
   };
 
+  // @ts-ignore - debug counter
+  _splatCount = 0;
+
   private splat(x: number, y: number, dx: number, dy: number) {
+    this._splatCount++;
     const gl = this.gl;
     const aspectRatio = this.canvas.width / this.canvas.height;
 
