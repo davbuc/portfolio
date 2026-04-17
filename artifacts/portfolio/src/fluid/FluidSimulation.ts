@@ -324,28 +324,25 @@ export class FluidSimulation {
       this.mouse.down = false;
     });
 
-    // Touch — attached to canvas to allow preventDefault without passive restriction
-    const canvas = this.canvas;
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
+    // Touch — on window to catch events regardless of which element is on top
+    window.addEventListener('touchstart', (e) => {
       const t = e.touches[0];
       this.updatePointer(t.clientX, t.clientY);
       this.mouse.px = this.mouse.x;
       this.mouse.py = this.mouse.y;
       this.mouse.down = true;
-    }, { passive: false });
+    }, { passive: true });
 
-    canvas.addEventListener('touchmove', (e) => {
-      e.preventDefault();
+    window.addEventListener('touchmove', (e) => {
       const t = e.touches[0];
       this.updatePointer(t.clientX, t.clientY);
-    }, { passive: false });
+    }, { passive: true });
 
-    canvas.addEventListener('touchend', () => {
+    window.addEventListener('touchend', () => {
       this.mouse.down = false;
     });
 
-    canvas.addEventListener('touchcancel', () => {
+    window.addEventListener('touchcancel', () => {
       this.mouse.down = false;
     });
   }
