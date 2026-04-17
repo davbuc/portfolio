@@ -103,6 +103,13 @@ html, body, #root {
   letter-spacing: 0.01em;
 }
 
+.bio-link {
+  display: block;
+  text-decoration: none;
+  margin-bottom: 3px;
+  pointer-events: all;
+}
+
 /* ── Theme toggle ── */
 .theme-toggle {
   background: none;

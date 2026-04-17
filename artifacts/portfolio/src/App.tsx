@@ -40,15 +40,7 @@ export default function App() {
         <header className="site-header">
           <span className="site-name">David Bucher</span>
           <nav className="site-nav">
-            <a
-              href="https://www.linkedin.com/in/david-bucher18"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nav-link"
-            >
-              LinkedIn
-            </a>
-            <button className="theme-toggle" onClick={toggleDark} aria-label="Toggle dark mode">
+              <button className="theme-toggle" onClick={toggleDark} aria-label="Toggle dark mode">
               {dark ? '○' : '●'}
             </button>
           </nav>
@@ -58,6 +50,15 @@ export default function App() {
           <p className="bio-primary">
             Building thoughtful digital products at the intersection of design and technology.
           </p>
+          <a
+            href="https://www.linkedin.com/in/david-bucher18"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bio-secondary bio-link"
+          >
+            LinkedIn
+          </a>
+          <p className="bio-secondary">Based in Zurich.</p>
         </main>
       </div>
     </div>
