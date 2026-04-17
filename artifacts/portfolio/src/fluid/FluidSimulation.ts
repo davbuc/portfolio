@@ -311,26 +311,11 @@ export class FluidSimulation {
   }
 
   private setupEventListeners() {
-    // Mouse
-    document.addEventListener('mousemove', (e) => {
-      this.updatePointer(e.clientX, e.clientY);
-    });
-
-    document.addEventListener('mousedown', () => {
-      this.mouse.down = true;
-    });
-
-    document.addEventListener('mouseup', () => {
-      this.mouse.down = false;
-    });
-
-    // Touch — splat directly from handlers (don't rely on frame-diff detection)
-    const touchStart = (e: TouchEvent) => {
-      if (e.touches.length === 0) return;
-      const t = e.touches[0];
-      // Seed pointer with current touch position
-      this.updatePointer(t.clientX, t.clientY);
-      // Reset previous so the first move produces a clean delta
+    // Unified pointer handling — works for mouse, touch, and pen.
+    // Splat directly from handlers (don't rely on frame-diff detection,
+    // which misses stationary taps and throttled iOS touchmove).
+    const pointerDown = (clientX: number, clientY: number) => {
+      this.updatePointer(clientX, clientY);
       this.mouse.px = this.mouse.x;
       this.mouse.py = this.mouse.y;
       this.mouse.down = true;
@@ -339,12 +324,10 @@ export class FluidSimulation {
       this.splat(this.mouse.x, this.mouse.y, rand(), rand());
     };
 
-    const touchMove = (e: TouchEvent) => {
-      if (e.touches.length === 0) return;
-      const t = e.touches[0];
+    const pointerMove = (clientX: number, clientY: number) => {
       const rect = this.canvas.getBoundingClientRect();
-      const nx = (t.clientX - rect.left) / rect.width;
-      const ny = 1 - (t.clientY - rect.top) / rect.height;
+      const nx = (clientX - rect.left) / rect.width;
+      const ny = 1 - (clientY - rect.top) / rect.height;
       const dx = (nx - this.mouse.x) * 500;
       const dy = (ny - this.mouse.y) * 500;
       this.mouse.px = this.mouse.x;
@@ -356,21 +339,34 @@ export class FluidSimulation {
       }
     };
 
-    const touchEnd = () => {
+    const pointerUp = () => {
       this.mouse.down = false;
     };
 
-    // Attach to canvas with non-passive so we can preventDefault iOS gestures,
-    // and also to window as a safety net for events dispatched above the canvas.
-    this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); touchStart(e); }, { passive: false });
-    this.canvas.addEventListener('touchmove',  (e) => { e.preventDefault(); touchMove(e);  }, { passive: false });
-    this.canvas.addEventListener('touchend', touchEnd);
-    this.canvas.addEventListener('touchcancel', touchEnd);
+    // Mouse (kept for broad compatibility)
+    document.addEventListener('mousemove', (e) => pointerMove(e.clientX, e.clientY));
+    document.addEventListener('mousedown', (e) => pointerDown(e.clientX, e.clientY));
+    document.addEventListener('mouseup', pointerUp);
 
-    window.addEventListener('touchstart', touchStart, { passive: true });
-    window.addEventListener('touchmove',  touchMove,  { passive: true });
-    window.addEventListener('touchend', touchEnd);
-    window.addEventListener('touchcancel', touchEnd);
+    // Touch — non-passive on canvas to preventDefault iOS gesture interception
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      pointerDown(t.clientX, t.clientY);
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      pointerMove(t.clientX, t.clientY);
+    };
+
+    // Attach to document so touches on overlay children also reach the sim
+    document.addEventListener('touchstart', onTouchStart, { passive: false });
+    document.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    document.addEventListener('touchend',    pointerUp);
+    document.addEventListener('touchcancel', pointerUp);
   }
 
   private animate = () => {
