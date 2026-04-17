@@ -81,9 +81,9 @@ export default function App() {
           </a>
         </main>
         <div style={{
-          position: 'absolute', bottom: 8, left: 8, right: 8,
-          padding: '6px 10px', fontSize: 10, fontFamily: 'monospace',
-          background: 'rgba(255,0,0,0.8)', color: '#fff',
+          position: 'fixed', top: 0, left: 0, right: 0,
+          padding: '8px 10px', fontSize: 11, fontFamily: 'monospace',
+          background: 'rgba(255,0,0,0.9)', color: '#fff',
           pointerEvents: 'none', zIndex: 100, wordBreak: 'break-all'
         }}>{debug}</div>
       </div>
