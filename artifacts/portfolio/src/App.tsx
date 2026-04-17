@@ -50,6 +50,7 @@ export default function App() {
           <p className="bio-primary">
             Building thoughtful digital products at the intersection of design and technology.
           </p>
+          <p className="bio-secondary">Based in Zurich</p>
           <a
             href="https://www.linkedin.com/in/david-bucher18"
             target="_blank"
@@ -58,7 +59,6 @@ export default function App() {
           >
             LinkedIn
           </a>
-          <p className="bio-secondary">Based in Zurich.</p>
         </main>
       </div>
     </div>
