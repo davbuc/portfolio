@@ -5,6 +5,26 @@ export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const simRef = useRef<FluidSimulation | null>(null);
   const [dark, setDark] = useState(false);
+  const [debug, setDebug] = useState('tap to test');
+
+  useEffect(() => {
+    const onStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      const c = canvasRef.current;
+      const rect = c?.getBoundingClientRect();
+      setDebug(`start ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} rect ${rect?.width.toFixed(0)}x${rect?.height.toFixed(0)} dpr ${window.devicePixelRatio} canvas ${c?.width}x${c?.height}`);
+    };
+    const onMove = (e: TouchEvent) => {
+      const t = e.touches[0];
+      setDebug(d => `move ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} | ${d.split(' | ')[0] ?? ''}`);
+    };
+    document.addEventListener('touchstart', onStart, { passive: true });
+    document.addEventListener('touchmove', onMove, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onStart);
+      document.removeEventListener('touchmove', onMove);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -60,6 +80,12 @@ export default function App() {
             LinkedIn
           </a>
         </main>
+        <div style={{
+          position: 'absolute', bottom: 8, left: 8, right: 8,
+          padding: '6px 10px', fontSize: 10, fontFamily: 'monospace',
+          background: 'rgba(255,0,0,0.8)', color: '#fff',
+          pointerEvents: 'none', zIndex: 100, wordBreak: 'break-all'
+        }}>{debug}</div>
       </div>
     </div>
   );
