@@ -1,0 +1,9 @@
+{
+  "installCommand": "cd ../.. && pnpm install --filter @workspace/portfolio --no-frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter @workspace/portfolio build",
+  "outputDirectory": "dist/public",
+  "env": {
+    "NODE_ENV": "production",
+    "BASE_PATH": "/"
+  }
+}
