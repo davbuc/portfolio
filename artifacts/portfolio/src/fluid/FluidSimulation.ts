@@ -324,27 +324,53 @@ export class FluidSimulation {
       this.mouse.down = false;
     });
 
-    // Touch — on window to catch events regardless of which element is on top
-    window.addEventListener('touchstart', (e) => {
+    // Touch — splat directly from handlers (don't rely on frame-diff detection)
+    const touchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
       const t = e.touches[0];
+      // Seed pointer with current touch position
       this.updatePointer(t.clientX, t.clientY);
+      // Reset previous so the first move produces a clean delta
       this.mouse.px = this.mouse.x;
       this.mouse.py = this.mouse.y;
       this.mouse.down = true;
-    }, { passive: true });
+      // Initial burst so a stationary tap still visibly splats
+      const rand = () => (Math.random() - 0.5) * 800;
+      this.splat(this.mouse.x, this.mouse.y, rand(), rand());
+    };
 
-    window.addEventListener('touchmove', (e) => {
+    const touchMove = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
       const t = e.touches[0];
-      this.updatePointer(t.clientX, t.clientY);
-    }, { passive: true });
+      const rect = this.canvas.getBoundingClientRect();
+      const nx = (t.clientX - rect.left) / rect.width;
+      const ny = 1 - (t.clientY - rect.top) / rect.height;
+      const dx = (nx - this.mouse.x) * 500;
+      const dy = (ny - this.mouse.y) * 500;
+      this.mouse.px = this.mouse.x;
+      this.mouse.py = this.mouse.y;
+      this.mouse.x = nx;
+      this.mouse.y = ny;
+      if (Math.abs(dx) > 0.0001 || Math.abs(dy) > 0.0001) {
+        this.splat(nx, ny, dx, dy);
+      }
+    };
 
-    window.addEventListener('touchend', () => {
+    const touchEnd = () => {
       this.mouse.down = false;
-    });
+    };
 
-    window.addEventListener('touchcancel', () => {
-      this.mouse.down = false;
-    });
+    // Attach to canvas with non-passive so we can preventDefault iOS gestures,
+    // and also to window as a safety net for events dispatched above the canvas.
+    this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); touchStart(e); }, { passive: false });
+    this.canvas.addEventListener('touchmove',  (e) => { e.preventDefault(); touchMove(e);  }, { passive: false });
+    this.canvas.addEventListener('touchend', touchEnd);
+    this.canvas.addEventListener('touchcancel', touchEnd);
+
+    window.addEventListener('touchstart', touchStart, { passive: true });
+    window.addEventListener('touchmove',  touchMove,  { passive: true });
+    window.addEventListener('touchend', touchEnd);
+    window.addEventListener('touchcancel', touchEnd);
   }
 
   private animate = () => {
