@@ -348,23 +348,21 @@ export class FluidSimulation {
     document.addEventListener('mousedown', (e) => pointerDown(e.clientX, e.clientY));
     document.addEventListener('mouseup', pointerUp);
 
-    // Touch — non-passive on canvas to preventDefault iOS gesture interception
+    // Touch — passive listeners so we don't kill tap-to-click synthesis
+    // on links/buttons. Gesture prevention is handled via CSS touch-action.
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
-      e.preventDefault();
       const t = e.touches[0];
       pointerDown(t.clientX, t.clientY);
     };
     const onTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
-      e.preventDefault();
       const t = e.touches[0];
       pointerMove(t.clientX, t.clientY);
     };
 
-    // Attach to document so touches on overlay children also reach the sim
-    document.addEventListener('touchstart', onTouchStart, { passive: false });
-    document.addEventListener('touchmove',  onTouchMove,  { passive: false });
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchmove',  onTouchMove,  { passive: true });
     document.addEventListener('touchend',    pointerUp);
     document.addEventListener('touchcancel', pointerUp);
   }
