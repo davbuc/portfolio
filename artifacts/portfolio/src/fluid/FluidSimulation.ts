@@ -352,9 +352,20 @@ export class FluidSimulation {
       this.mouse.px = this.mouse.x;
       this.mouse.py = this.mouse.y;
       this.mouse.down = true;
-      // Stationary tap: zero velocity so the dye stays a round dot
-      // instead of being immediately advected into a streak.
-      this.splat(this.mouse.x, this.mouse.y, 0, 0);
+      // Stationary tap: emit a small cluster of jittered splats with
+      // weak random velocities so the result looks organic and uneven
+      // rather than a clean circle or ellipse.
+      const cx = this.mouse.x;
+      const cy = this.mouse.y;
+      const jitter = 0.012;
+      const vel = 60;
+      for (let i = 0; i < 4; i++) {
+        const ox = (Math.random() - 0.5) * jitter;
+        const oy = (Math.random() - 0.5) * jitter;
+        const vx = (Math.random() - 0.5) * vel;
+        const vy = (Math.random() - 0.5) * vel;
+        this.splat(cx + ox, cy + oy, vx, vy);
+      }
     };
 
     const pointerMove = (clientX: number, clientY: number) => {
