@@ -5,28 +5,6 @@ export default function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const simRef = useRef<FluidSimulation | null>(null);
   const [dark, setDark] = useState(false);
-  const [debug, setDebug] = useState('tap to test');
-
-  useEffect(() => {
-    const onStart = (e: TouchEvent) => {
-      const t = e.touches[0];
-      const sim: any = simRef.current;
-      const splats = sim?._splatCount ?? 'no-sim';
-      setDebug(`start ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} splats=${splats}`);
-    };
-    const onMove = (e: TouchEvent) => {
-      const t = e.touches[0];
-      const sim: any = simRef.current;
-      const splats = sim?._splatCount ?? '?';
-      setDebug(`move ${t?.clientX.toFixed(0)},${t?.clientY.toFixed(0)} splats=${splats}`);
-    };
-    document.addEventListener('touchstart', onStart, { passive: true });
-    document.addEventListener('touchmove', onMove, { passive: true });
-    return () => {
-      document.removeEventListener('touchstart', onStart);
-      document.removeEventListener('touchmove', onMove);
-    };
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,12 +60,6 @@ export default function App() {
             LinkedIn
           </a>
         </main>
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0,
-          padding: '8px 10px', fontSize: 11, fontFamily: 'monospace',
-          background: 'rgba(255,0,0,0.9)', color: '#fff',
-          pointerEvents: 'none', zIndex: 100, wordBreak: 'break-all'
-        }}>{debug}</div>
       </div>
     </div>
   );

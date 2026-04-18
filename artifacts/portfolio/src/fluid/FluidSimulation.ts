@@ -418,13 +418,17 @@ export class FluidSimulation {
     this.animationId = requestAnimationFrame(this.animate);
   };
 
-  // @ts-ignore - debug counter
-  _splatCount = 0;
-
   private splat(x: number, y: number, dx: number, dy: number) {
-    this._splatCount++;
     const gl = this.gl;
     const aspectRatio = this.canvas.width / this.canvas.height;
+
+    // Smaller radius on touch devices so the effect feels proportional
+    // to a fingertip rather than a cursor.
+    const isTouch = typeof window !== 'undefined' &&
+      (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window);
+    const velRadius = isTouch ? 0.006 : 0.02;
+    const dyeRadius = isTouch ? 0.008 : 0.025;
+    const velScale = isTouch ? 0.25 : 0.5;
 
     // Splat velocity
     this.bindFbo(this.velocity.write);
@@ -433,8 +437,8 @@ export class FluidSimulation {
     gl.uniform1i(gl.getUniformLocation(this.splatProgram, 'uTarget'), 0);
     gl.uniform1f(gl.getUniformLocation(this.splatProgram, 'aspectRatio'), aspectRatio);
     gl.uniform2f(gl.getUniformLocation(this.splatProgram, 'point'), x, y);
-    gl.uniform3f(gl.getUniformLocation(this.splatProgram, 'color'), dx * 0.5, dy * 0.5, 0);
-    gl.uniform1f(gl.getUniformLocation(this.splatProgram, 'radius'), 0.02);
+    gl.uniform3f(gl.getUniformLocation(this.splatProgram, 'color'), dx * velScale, dy * velScale, 0);
+    gl.uniform1f(gl.getUniformLocation(this.splatProgram, 'radius'), velRadius);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.velocity.read.texture);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -444,7 +448,7 @@ export class FluidSimulation {
     this.bindFbo(this.dye.write);
     gl.uniform2f(gl.getUniformLocation(this.splatProgram, 'point'), x, y);
     gl.uniform3f(gl.getUniformLocation(this.splatProgram, 'color'), 0.8, 0.8, 0.8);
-    gl.uniform1f(gl.getUniformLocation(this.splatProgram, 'radius'), 0.025);
+    gl.uniform1f(gl.getUniformLocation(this.splatProgram, 'radius'), dyeRadius);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.dye.read.texture);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
