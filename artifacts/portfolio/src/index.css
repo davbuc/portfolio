@@ -181,6 +181,7 @@ html, body, #root {
 }
 
 .app-container.dark .site-name,
+.app-container.dark .site-coords,
 .app-container.dark .nav-link,
 .app-container.dark .theme-toggle,
 .app-container.dark .bio-primary,
