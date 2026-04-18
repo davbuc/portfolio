@@ -48,12 +48,15 @@ export class FluidSimulation {
     this.animate();
   }
 
+  private supportsLinearFiltering = true;
+
   private setupExtensions() {
     const gl = this.gl;
     gl.getExtension('OES_texture_float');
     gl.getExtension('OES_texture_half_float');
-    gl.getExtension('OES_texture_float_linear');
-    gl.getExtension('OES_texture_half_float_linear');
+    const floatLinear = gl.getExtension('OES_texture_float_linear');
+    const halfLinear = gl.getExtension('OES_texture_half_float_linear');
+    this.supportsLinearFiltering = !!(floatLinear || halfLinear);
   }
 
   private compilePrograms() {
@@ -253,11 +256,40 @@ export class FluidSimulation {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
-    // Setup textures
+    // Setup textures — pick a format that actually works as a render target.
+    // iOS Safari accepts OES_texture_half_float but NOT OES_texture_float for
+    // FBO attachments, so we must probe which one round-trips correctly.
+    const halfFloatExt = gl.getExtension('OES_texture_half_float');
     const floatExt = gl.getExtension('OES_texture_float');
-    const texType = floatExt ? gl.FLOAT : gl.UNSIGNED_BYTE;
+    const HALF_FLOAT_OES = halfFloatExt ? halfFloatExt.HALF_FLOAT_OES : 0x8D61;
     const internalFormat = gl.RGBA;
     const format = gl.RGBA;
+
+    const supportsFormat = (type: number) => {
+      const tex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, 4, 4, 0, format, type, null);
+      const fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+      const ok = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+      gl.deleteTexture(tex);
+      gl.deleteFramebuffer(fbo);
+      return ok;
+    };
+
+    let texType: number;
+    if (halfFloatExt && supportsFormat(HALF_FLOAT_OES)) {
+      texType = HALF_FLOAT_OES;
+    } else if (floatExt && supportsFormat(gl.FLOAT)) {
+      texType = gl.FLOAT;
+    } else {
+      texType = gl.UNSIGNED_BYTE;
+    }
 
     this.dye = this.createDoubleFBO(width, height, internalFormat, format, texType);
     this.velocity = this.createDoubleFBO(width, height, internalFormat, format, texType);
@@ -270,10 +302,11 @@ export class FluidSimulation {
 
   private createFBO(w: number, h: number, internalFormat: number, format: number, type: number) {
     const gl = this.gl;
+    const filter = this.supportsLinearFiltering ? gl.LINEAR : gl.NEAREST;
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, w, h, 0, format, type, null);
