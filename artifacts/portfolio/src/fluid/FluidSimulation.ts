@@ -352,9 +352,9 @@ export class FluidSimulation {
       this.mouse.px = this.mouse.x;
       this.mouse.py = this.mouse.y;
       this.mouse.down = true;
-      // Initial burst so a stationary tap still visibly splats
-      const rand = () => (Math.random() - 0.5) * 800;
-      this.splat(this.mouse.x, this.mouse.y, rand(), rand());
+      // Stationary tap: zero velocity so the dye stays a round dot
+      // instead of being immediately advected into a streak.
+      this.splat(this.mouse.x, this.mouse.y, 0, 0);
     };
 
     const pointerMove = (clientX: number, clientY: number) => {
@@ -426,8 +426,8 @@ export class FluidSimulation {
     // to a fingertip rather than a cursor.
     const isTouch = typeof window !== 'undefined' &&
       (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window);
-    const velRadius = isTouch ? 0.006 : 0.02;
-    const dyeRadius = isTouch ? 0.008 : 0.025;
+    const velRadius = isTouch ? 0.010 : 0.02;
+    const dyeRadius = isTouch ? 0.013 : 0.025;
     const velScale = isTouch ? 0.25 : 0.5;
 
     // Splat velocity
