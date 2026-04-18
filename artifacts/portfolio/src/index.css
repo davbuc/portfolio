@@ -10,7 +10,7 @@ html, body, #root {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #eff2f6;
+  background: linear-gradient(to bottom, #f6ede7 0%, #e1ebf3 100%);
   touch-action: none;
   /* Prevent iOS rubber-band and keep the viewport locked */
   position: fixed;
@@ -26,7 +26,7 @@ html, body, #root {
      Fallback to 100vh for older browsers. */
   height: 100vh;
   height: 100svh;
-  background: #eff2f6;
+  background: linear-gradient(to bottom, #f6ede7 0%, #e1ebf3 100%);
   overflow: hidden;
 }
 

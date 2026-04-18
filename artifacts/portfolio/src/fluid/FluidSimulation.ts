@@ -29,8 +29,10 @@ export class FluidSimulation {
   private animationId = 0;
   private lastTime = Date.now();
 
-  // Colors
-  private bgColor = [0.94, 0.96, 0.98];
+  // Colors — subtle warm-to-cool gradient so the white fluid stands out
+  // while the overall surface still reads as "near white".
+  private bgTop = [0.965, 0.935, 0.905];    // warm peachy cream
+  private bgBottom = [0.885, 0.920, 0.955]; // soft cool blue
   private fluidColor = [1.0, 1.0, 1.0];
 
   constructor(canvas: HTMLCanvasElement) {
@@ -93,12 +95,14 @@ export class FluidSimulation {
       precision highp float;
       varying vec2 vUv;
       uniform sampler2D uTexture;
-      uniform vec3 uBgColor;
+      uniform vec3 uBgTop;
+      uniform vec3 uBgBottom;
       uniform vec3 uFluidColor;
       void main() {
         vec3 c = texture2D(uTexture, vUv).rgb;
         float v = (c.r + c.g + c.b) / 3.0;
-        gl_FragColor = vec4(mix(uBgColor, uFluidColor, v), 1.0);
+        vec3 bg = mix(uBgBottom, uBgTop, vUv.y);
+        gl_FragColor = vec4(mix(bg, uFluidColor, v), 1.0);
       }
     `;
 
@@ -576,7 +580,8 @@ export class FluidSimulation {
     gl.useProgram(this.displayProgram);
     this.setupQuad(this.displayProgram);
     gl.uniform1i(gl.getUniformLocation(this.displayProgram, 'uTexture'), 0);
-    gl.uniform3f(gl.getUniformLocation(this.displayProgram, 'uBgColor'), this.bgColor[0], this.bgColor[1], this.bgColor[2]);
+    gl.uniform3f(gl.getUniformLocation(this.displayProgram, 'uBgTop'), this.bgTop[0], this.bgTop[1], this.bgTop[2]);
+    gl.uniform3f(gl.getUniformLocation(this.displayProgram, 'uBgBottom'), this.bgBottom[0], this.bgBottom[1], this.bgBottom[2]);
     gl.uniform3f(gl.getUniformLocation(this.displayProgram, 'uFluidColor'), this.fluidColor[0], this.fluidColor[1], this.fluidColor[2]);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.dye.read.texture);
@@ -585,13 +590,15 @@ export class FluidSimulation {
 
   setDarkMode(dark: boolean) {
     if (dark) {
-      this.bgColor = [0.0, 0.0, 0.0];
+      this.bgTop = [0.0, 0.0, 0.0];
+      this.bgBottom = [0.0, 0.0, 0.0];
       this.fluidColor = [1.0, 1.0, 1.0];
       this.gl.clearColor(0, 0, 0, 1);
     } else {
-      this.bgColor = [0.94, 0.96, 0.98];
+      this.bgTop = [0.965, 0.935, 0.905];
+      this.bgBottom = [0.885, 0.920, 0.955];
       this.fluidColor = [1.0, 1.0, 1.0];
-      this.gl.clearColor(0.94, 0.96, 0.98, 1);
+      this.gl.clearColor(0.93, 0.93, 0.93, 1);
     }
   }
 
