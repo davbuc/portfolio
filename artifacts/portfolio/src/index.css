@@ -45,9 +45,15 @@ html, body, #root {
 /* ── Header ── */
 .site-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   width: 100%;
+}
+
+.site-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .site-name {
@@ -56,6 +62,21 @@ html, body, #root {
   font-weight: 500;
   letter-spacing: 0.02em;
   color: #181818;
+}
+
+.site-coords {
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: #181818;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  min-height: 1em;
+}
+
+.site-coords.visible {
+  opacity: 0.45;
 }
 
 .site-nav {
